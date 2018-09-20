@@ -1,6 +1,6 @@
 pipleline {
 	agent any
-	{
+
 		stages {
 			stage('Build') {
 				steps {
@@ -14,5 +14,4 @@ pipleline {
 				}
 			}
 		}
-	}
 }
