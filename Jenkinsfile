@@ -27,13 +27,13 @@ pipeline {
 			parallel {
 				stage ('Deploy to Staging') {
 					steps {
-						sh "scp -i /home/jenkins/BAHDevKeyPair.pem **/target/*.war ubuntu@${params.tomcat_stage}:/opt/tomcat/latest/webapps"
+						sh "scp -i '/home/jenkins/BAHDevKeyPair.pem' **/target/*.war ubuntu@${params.tomcat_stage}:/opt/tomcat/latest/webapps"
 					}
 				}
 				
 				stage ('Deploy to Production') {
 					steps {
-						sh "scp -i /home/jenkins/BAHDevKeyPair.pem **/target/*.war ubuntu@${params.tomcat_prod}:/opt/tomcat/latest/webapps"
+						sh "scp -i '/home/jenkins/BAHDevKeyPair.pem' **/target/*.war ubuntu@${params.tomcat_prod}:/opt/tomcat/latest/webapps"
 					}
 				}
 			}
