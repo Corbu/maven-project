@@ -1,38 +1,26 @@
 pipeline {
 	agent any
-
-	stages {
-		stage('Build') {
-			steps {
-				sh 'mvn clean package'
-			}
-			post {
-				success {
-					echo 'Now archiving...'
-					archiveArtifacts artifacts: '**/target/*.war'
+	
+	parameters {
+		string (name: 'tomcat_stage', defaultValue: '54.87.193.159', description: 'Staging Tomcat Instance')
+		string (name: 'tomcat_prod', defaultValue: '35.172.192.77', description: "Production Tomcat Instance')
+	}
+	
+	triggers {
+		pollSCM ('* * * * *')
+	}
+	
+	stage ('Deployments) {
+		parallel {
+			stage ('Deploy to Staging') {
+				steps {
+					sh "scp -i /home/jenkins/BAHDevKeyPair.pem **/target/*.war ubuntu@$(params.tomcat_stage):/opt/tomcat/latest/webapps"
 				}
 			}
-		}
-		stage('Deploy to Staging') {
-			steps {
-				build job: 'Deploy-to-staging'
-			}
-		}
-		stage('Deploy to Production') {
-			steps {
-				timeout(time:5, unit:'DAYS') {
-					input message: 'Approve PRODUCTION Deployment?'
-				}
-				
-				build job: 'Deploy-to-prod'
-			}
-			post {
-				success {
-					echo 'Code deployed to production.'
-				}
-				
-				failure {
-					echo 'Deployment failed.'
+			
+			stage ('Deploy to Production') {
+				steps {
+					sh "scp -i /home/jenkins/BAHDevKeyPair.pem **/target/*.war ubuntu@$(params.tomcat_prod):/opt/tomcat/latest/webapps"
 				}
 			}
 		}
